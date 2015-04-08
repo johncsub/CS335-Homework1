@@ -263,14 +263,14 @@ void movement(Game *game)
 {
 	Particle *p;
 
-	if (game->n <= 0)
-		return;
-
 	if(game->bubbler) {
 		for(int i=0;i<10;i++){
 			makeParticle(game, game->lastMouse[0], game->lastMouse[1]);
 		}
 	}
+
+	if (game->n <= 0)
+		return;
 
 	for(int i=0; i<game->n;i++) {
 		p = &game->particle[i];
