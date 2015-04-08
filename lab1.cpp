@@ -299,9 +299,12 @@ void movement(Game *game)
 		dist=sqrt((d0*d0)+(d1*d1));
 		if(dist <= game->circle.radius) {
 			//collision to circle!
+			//move out of collision state
+			p->s.center.x=game->circle.center.x+(d0/dist)*game->circle.radius*1.01;
+			p->s.center.y=game->circle.center.y+(d1/dist)*game->circle.radius*1.01;
 			//apply penalty
-			p->velocity.x += (d0/dist);
-			p->velocity.y += (d1/dist);
+			p->velocity.x += (d0/dist)*2.25;
+			p->velocity.y += (d1/dist)*2.25;
 		}
 
 
@@ -358,14 +361,6 @@ void render(Game *game)
 		glEnd();
 		glPopMatrix();
 	}
-	//TODO: add circle code, and collision
-	/*
-	   s= &game->circle;
-	   glPushMatrix();
-	   glTranslatef(s->center.x, s->center.y, 0.0f);
-	   w=->s->width;
-	   h=s->height;
-	   glBegin(GL_CIRCLE);*/
 
 	//draw all particles here
 	glPushMatrix();
