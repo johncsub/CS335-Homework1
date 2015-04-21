@@ -46,6 +46,7 @@
 #define MAX_PARTICLES 400000
 #define GRAVITY 0.1
 #define MAX_BOXES 5
+#define NEW_PARTICLES 25
 
 //X Windows variables
 Display *dpy;
@@ -72,6 +73,7 @@ struct Particle {
 
 struct Game {
 	bool bubbler;
+    bool nyan_colors;
 	Particle *particle;
 	int lastMouse[2];
 	Shape box[MAX_BOXES];
@@ -80,6 +82,7 @@ struct Game {
 
 	Game() {
 		bubbler=false;
+        nyan_colors=false;
 		particle = new Particle[MAX_PARTICLES];
 		n=0;
 		//declare a box shape
@@ -218,7 +221,7 @@ void check_mouse(XEvent *e, Game *game)
 		if (e->xbutton.button==1) {
 			//Left button was pressed
 			int y = WINDOW_HEIGHT - e->xbutton.y;
-			for(int i=0;i<10;i++)
+            for(int i=0;i<NEW_PARTICLES;i++)
 				makeParticle(game, e->xbutton.x, y);
 			return;
 		}
@@ -234,7 +237,7 @@ void check_mouse(XEvent *e, Game *game)
 		if (++n < 10)
 			return;
 		int y = WINDOW_HEIGHT - e->xbutton.y;
-		for(int i=0;i<10;i++)
+        for(int i=0;i<NEW_PARTICLES;i++)
 			makeParticle(game, e->xbutton.x, y);
 
 		game->lastMouse[0]=savex;
@@ -254,6 +257,9 @@ int check_keys(XEvent *e, Game *game)
 		if(key == XK_b) {
 			game->bubbler=!(game->bubbler);
 		}
+        if(key == XK_h) {
+            game->nyan_colors=!(game->nyan_colors);
+        }
 
 	}
 	return 0;
@@ -264,7 +270,7 @@ void movement(Game *game)
 	Particle *p;
 
 	if(game->bubbler) {
-		for(int i=0;i<10;i++){
+        for(int i=0;i<NEW_PARTICLES;i++){
 			makeParticle(game, game->lastMouse[0], game->lastMouse[1]);
 		}
 	}
@@ -272,6 +278,8 @@ void movement(Game *game)
 	if (game->n <= 0)
 		return;
 
+    const float min_X = 0.65f;
+    const float vel_Y = 0.425;
 	for(int i=0; i<game->n;i++) {
 		p = &game->particle[i];
 		p->s.center.x += p->velocity.x;
@@ -289,7 +297,13 @@ void movement(Game *game)
 
 				//collision w/ box
 				p->s.center.y = game->box[j].center.y+10;
-				p->velocity.y *= -0.5;
+                p->velocity.y *= -vel_Y;
+                if(p->velocity.x < min_X) {
+                    if(p->velocity.x < 0.0f)
+                        p->velocity.x *= -1.0f;
+                    else
+                        p->velocity.x = min_X + ((rnd()*2.5)*0.4);
+                }
 			}
 		}
 		// set circle collision
@@ -362,11 +376,21 @@ void render(Game *game)
 		glPopMatrix();
 	}
 
+    float nyan_R, nyan_G, nyan_B;
 	//draw all particles here
 	glPushMatrix();
-	glColor3ub(150,160,220);
+    if(!game->nyan_colors)
+        glColor3ub(150,160,220);
+    else {
+        nyan_R = rnd()*255;
+        nyan_G = (rnd()*255) - nyan_R;
+        nyan_B = (rnd()*255) - (nyan_R + nyan_G);
+        glColor3ub(nyan_R,nyan_G,nyan_B);
+    }
 	for(int i=0;i<game->n;i++) {
-		Vec *c = &game->particle[i].s.center;
+        //if(game->nyan_colors)
+            //glColor3ub(rnd()*255,rnd()*255,rnd()*255);
+        Vec *c = &game->particle[i].s.center;
 		w = 2;
 		h = 2;
 		glBegin(GL_QUADS);
