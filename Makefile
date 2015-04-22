@@ -5,7 +5,8 @@ all: hw1
 
 hw1: hw1.cpp
 #	g++ lab1.cpp -Wall -o lab1 -lX11 -lGL -lGLU -lm
-	g++ hw1.cpp -Wall -o hw1 -lX11 -lGL -lm
+#	g++ hw1.cpp -Wall -o hw1 -lX11 -lGL -lm
+	g++ hw1.cpp -Wall -o hw1 -lX11 -lGL -lm ./libggfonts.so
 
 clean:
 	rm -f hw1
