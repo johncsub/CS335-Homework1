@@ -206,6 +206,7 @@ void init_opengl(void)
     glClearColor(0.1, 0.1, 0.1, 1.0);
 
     //initialize fonts
+    glEnable(GL_TEXTURE_2D);
     initialize_fonts();
 }
 
@@ -365,11 +366,6 @@ void render(Game *game)
 	}
 	first=false;
     }
-    Rect wm;
-    wm.bot=30;
-    wm.left=0;
-    wm.center=0;
-    ggprint16(&wm, 36, 0x00ffffff,"Waterfall model");
 
     glBegin(GL_LINE_LOOP);
     glColor3ub(60,140,90);
@@ -380,10 +376,9 @@ void render(Game *game)
     glEnd();
     //draw box
     Shape *s;
-    glColor3ub(90,140,90);
     for(int i=0; i<MAX_BOXES;i++) {
-	Rect r;
 	s = &game->box[i];
+    glColor3ub(90,140,90);
 	glPushMatrix();
 	glTranslatef(s->center.x, s->center.y, s->center.z);
 	w = s->width;
@@ -395,10 +390,6 @@ void render(Game *game)
 	glVertex2i( w,-h);
 	glEnd();
 	glPopMatrix();
-	r.bot=h;
-	r.left=w;
-	r.center=0;
-	ggprint16(&r, 36, 0x00cdc2c2, waterfall[i].c_str());
     }
 
     float nyan_R, nyan_G, nyan_B;
@@ -426,6 +417,30 @@ void render(Game *game)
 	glEnd();
 	glPopMatrix();
     }
+
+    // draw text onto screen
+    glDisable(GL_TEXTURE_2D);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    Rect wm;
+    wm.bot=WINDOW_HEIGHT-30;
+    wm.left=0;
+    wm.center=0;
+    ggprint16(&wm, 36, 0x00ffffff,"Waterfall model");
+
+    for(int i=0; i<MAX_BOXES;i++) {
+    Shape *s;
+    s = &game->box[i];
+    w = s->width;
+    h = s->height;
+    Rect r;
+    r.bot=s->center.y-h;
+    r.left=s->center.x-(w/2);
+    r.center=0;
+    ggprint16(&r, 36, 0x00d1a319, waterfall[i].c_str());
+    }
+
 }
 
 
